@@ -62,11 +62,11 @@ int main (int argc, char* argv[])
 
 	/* Instatiate your CPUStat object here. CPUStat class is responsible to keep track of all 
 	the required statistics. */
-    CPUStat myStat;
+    CPUStat cpu_stats;
 
 
 	/* OPTIONAL: Instantiate your Instruction object here. */
-	// Instruction myInst; 
+	Instruction cur_instruction; 
 
 	bool to_continue = false;
 
@@ -75,22 +75,23 @@ int main (int argc, char* argv[])
 		//fetch
 		myCPU.Fetch(instMem, instMem_len); // fetching the Instruction
 		// decode
-		to_continue = myCPU.Decode(&myStat); // decoding
+		to_continue = myCPU.Decode(&cpu_stats, &cur_instruction); // decoding
 
 		// we should break the loop if the current Instruction is BREAK Instruction (i.e., if opcode == 0)
 		if (!to_continue)
 		{
 			break;
 		}
-
-		// rest will be added in the next projects ... 
+		// Read from the registers
+		// Explicitly set RegWrite to 0 so that we don't write at this stage
+		myCPU.RegisterFile(cur_instruction.getRs1(), cur_instruction.getRs2(), cur_instruction.getRd(), bitset<32>(0b0), bitset<1>(0b0));
 
 	}
 
 	// clean up the memory (if any)
 
 	// print the stats
-	myStat.print();
+	cpu_stats.print();
 
 	return 0; 
 	

@@ -5,20 +5,21 @@
 
 #include <string>
 #include <bits/stdc++.h>
+#include "Instruction.h"
 using namespace std;
 
-class Instruction; // TODO: maybe remove
 class CPUStat;
 
 class CPU
 {
   public:
-        // Constructor
-        CPU();
+      // Constructor
+      CPU();
 
-        // Functions
-        void Fetch(string instMem[], int instMem_len);
-        bool Decode(CPUStat* myStat);
+      // Functions
+      void Fetch(string instMem[], int instMem_len);
+      bool Decode(CPUStat* cpu_stats, Instruction* cur_instruction);
+      void RegisterFile(bitset<5> readReg1, bitset<5> readReg2,bitset<5> writeReg, bitset<32> writeData, bitset<1> RegWrite);
       //   // Getters
       //   bitset<1> getRegWrite();
       //   bitset<1> getAluSrc();
@@ -37,16 +38,20 @@ class CPU
       //   void setAluOp(bitset<4> aluop);
 
   private:
-        int m_PC;
-        bitset<32> m_32bit_instruction; // 32 bit instruction in binary
-        // Control Signals
-        bitset<1> RegWrite;
-        bitset<1> AluSrc;
-        bitset<1> Branch;
-        bitset<1> MemRe;
-        bitset<1> MemWr;
-        bitset<1> MemtoReg;
-        bitset<4> ALUOp;
+      int m_PC;
+      bitset<32> m_32bit_instruction; // 32 bit instruction in binary
+      bitset<32> x[32]; // Registers
+      // Register File Outputs
+      bitset<32> readData1;
+      bitset<32> readData2;
+      // Control Signals
+      bitset<1> RegWrite;
+      bitset<1> AluSrc;
+      bitset<1> Branch;
+      bitset<1> MemRe;
+      bitset<1> MemWr;
+      bitset<1> MemtoReg;
+      bitset<4> ALUOp;
 };
 
 #endif // CPU_INCLUDED

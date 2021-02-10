@@ -105,6 +105,12 @@ int main (int argc, char* argv[])
 		// Write Back
 		myCPU.WriteBack(cur_instruction.getRd(), ALUresult);
 
+		// cout << "### " << cur_instruction.getRd() << endl;
+		// cout << "### " <<  ALUresult << endl;
+
+		// Data Memory
+		myCPU.Mem(cur_instruction.getRd(), cur_instruction.getRs2(), ALUresult, dataMem);
+
 	}
 
 	// clean up the memory (if any)

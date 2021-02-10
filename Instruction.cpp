@@ -30,6 +30,18 @@ Instruction::Instruction()
     m_type = ' ';
 }
 
+void Instruction::print() {
+    cout << "###" << endl;
+    cout << "opcode: " << m_opcode.to_string() << endl;
+    cout << "rd: " << m_rd.to_ulong() << endl;
+    cout << "func3: " << m_func3.to_string() << endl;
+    cout << "rs1: " << m_rs1.to_string() << endl;
+    cout << "rs2: " << m_rs2.to_string() << endl;
+    cout << "func7: " << m_func7.to_string() << endl;
+    cout << "imm: " << m_imm.to_ulong() << endl;
+    cout << "###" << endl;
+}
+
 // Accessors and Mutators
 
 bitset<7> Instruction::getOpcode()

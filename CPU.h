@@ -22,6 +22,7 @@ class CPU
       bool Decode(CPUStat* cpu_stats, Instruction* cur_instruction);
       tuple<bitset<32>, bitset<32>> RegisterFile(bitset<5> readReg1, bitset<5> readReg2,bitset<5> writeReg, bitset<32> writeData, bitset<1> RegWrite);
       tuple<bitset<1>, bitset<32>> Execute(bitset<32> readData1, bitset<32> readData2, bitset<32> immediate);
+      void Mem(bitset<5> rd, bitset<5> rs2, bitset<32> ALUresult, bitset<8> dataMem[]);
       void WriteBack(bitset<5> writeReg, bitset<32> ALUresult);
       //   // Getters
       //   bitset<1> getRegWrite();

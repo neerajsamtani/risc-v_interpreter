@@ -53,7 +53,6 @@ void CPU::Fetch(string instMem[], int instMem_len)
     string a = instMem[i++];
     // Reverse order since it is stored in little endian
     m_32bit_instruction = bitset<32>(string(a + b + c + d));
-    // cout << m_32bit_instruction.to_string() << endl;
     // Increment PC
     m_PC += 4;
 }
@@ -228,12 +227,43 @@ tuple<bitset<1>, bitset<32>> CPU::Execute(bitset<32> readData1, bitset<32> readD
 
 }
 
-void CPU::WriteBack(bitset<5> writeReg, bitset<32> ALUresult) {
-    if (RegWrite[0] == 1) {
-        RegisterFile(bitset<5>(0b0), bitset<5>(0b0), writeReg, ALUresult, bitset<1>(0b1));
+bitset<32>* CPU::getRegisters() {
+    return x;
+}
+
+void CPU::Mem(bitset<5> rd, bitset<5> rs2, bitset<32> ALUresult, bitset<8> dataMem[]) {
+    // lw
+    if (MemRe[0] == 1) {
+        // Load 4 bytes
+        int i = ALUresult.to_ulong();
+        cout << "LOAD WORD: x" << rd.to_ulong() << " <- ";
+        string d = dataMem[i++].to_string();
+        string c = dataMem[i++].to_string();
+        string b = dataMem[i++].to_string();
+        string a = dataMem[i++].to_string();
+        // Reverse order since it is stored in little endian
+        bitset<32> word(string(a + b + c + d));
+        x[rd.to_ulong()] = word;
+        cout << word.to_string() << endl;
+    }
+    // sw
+    if (MemWr[0] == 1) {
+        // What we want: dataMem[ALUresult.to_ulong()] = x[rd_or_rs2.to_ulong()];
+        cout << "RS2: " << rs2 << "\t ALU RESULT: " << ALUresult << endl;
+        int i = ALUresult.to_ulong();
+        bitset<32> extract_word(0b11111111);
+        bitset<32> data_32bit(x[rs2.to_ulong()]);
+        cout << "STORE WORD dataMem[" << i << "] <- x" << rs2.to_ulong() << endl;
+        dataMem[i++] = bitset<8>((extract_word & data_32bit).to_ulong());
+        dataMem[i++] = bitset<8>((extract_word & (data_32bit >> 8)).to_ulong());
+        dataMem[i++] = bitset<8>((extract_word & (data_32bit >> 16)).to_ulong());
+        dataMem[i++] = bitset<8>((extract_word & (data_32bit >> 24)).to_ulong());
     }
 }
 
-bitset<32>* CPU::getRegisters() {
-    return x;
+void CPU::WriteBack(bitset<5> writeReg, bitset<32> ALUresult) {
+    // TODO: Handle MemtoReg MUX????
+    if (RegWrite[0] == 1) {
+        RegisterFile(bitset<5>(0b0), bitset<5>(0b0), writeReg, ALUresult, bitset<1>(0b1));
+    }
 }

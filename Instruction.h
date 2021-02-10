@@ -12,6 +12,9 @@ class Instruction
         // Constructor
         Instruction();
 
+        // Print
+        void print();
+
         // Accessors and Mutators
         bitset<7> getOpcode();
         void setOpcode(bitset<7> opcode);

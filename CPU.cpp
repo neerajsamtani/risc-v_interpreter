@@ -103,20 +103,20 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
         // Set Control Signals
         RegWrite[0] = 1;
         if (cur_instruction->getFunc3() == bitset<3>(0b000) && cur_instruction->getFunc7() == bitset<7>(0b0)) {
-            cout << "\t\t\tadd" << endl;
+            // cout << "\t\t\tadd" << endl;
             cpu_stats->m_add++;
             ALUOp = bitset<4>(0b0010);
         }
         else if (cur_instruction->getFunc3() == bitset<3>(0b000) && cur_instruction->getFunc7() == bitset<7>(0b0100000)) {
-            cout << "\t\t\tsub" << endl;
+            // cout << "\t\t\tsub" << endl;
             ALUOp = bitset<4>(0b0110);
         }
         else if (cur_instruction->getFunc3() == bitset<3>(0b111) && cur_instruction->getFunc7() == bitset<7>(0b0)) {
-            cout << "\t\t\tand" << endl;
+            // cout << "\t\t\tand" << endl;
             ALUOp = bitset<4>(0b0000);
         }
         else if (cur_instruction->getFunc3() == bitset<3>(0b110) && cur_instruction->getFunc7() == bitset<7>(0b0)) {
-            cout << "\t\t\tor" << endl;
+            // cout << "\t\t\tor" << endl;
             ALUOp = bitset<4>(0b0001);
         }
         }
@@ -125,21 +125,20 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
         // Update Stats
         cpu_stats->m_i++;
         // Set Immediate
-        cur_instruction->setImm(bitset<20>(cur_instruction->getFunc7().to_string() + cur_instruction->getRs2().to_string()));
+        cur_instruction->setImm(bitset<12>(cur_instruction->getFunc7().to_string() + cur_instruction->getRs2().to_string()));
         // Set Control Signals
         RegWrite[0] = 1;
         AluSrc[0] = 1;
         if (cur_instruction->getFunc3() == bitset<3>(0b000)) {
-            cout << "\t\t\taddi" << endl;
-            cpu_stats->m_add++;
+            // cout << "\t\t\taddi" << endl;
             ALUOp = bitset<4>(0b0010);
         }
         else if (cur_instruction->getFunc3() == bitset<3>(0b111)) {
-            cout << "\t\t\tandi" << endl;
+            // cout << "\t\t\tandi" << endl;
             ALUOp = bitset<4>(0b0000);
         }
         else if (cur_instruction->getFunc3() == bitset<3>(0b110)) {
-            cout << "\t\t\tori" << endl;
+            // cout << "\t\t\tori" << endl;
             ALUOp = bitset<4>(0b0001);
         }
         }
@@ -149,7 +148,7 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
         cpu_stats->m_i++;
         cpu_stats->m_lw++;
         // Set Immediate
-        cur_instruction->setImm(bitset<20>(cur_instruction->getFunc7().to_string() + cur_instruction->getRs2().to_string()));
+        cur_instruction->setImm(bitset<12>(cur_instruction->getFunc7().to_string() + cur_instruction->getRs2().to_string()));
         // Set Control Signals
         RegWrite[0] = 1;
         AluSrc[0] = 1;
@@ -163,16 +162,17 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
         cpu_stats->m_s++;
         cpu_stats->m_sw++;
         // Set Immediate
-        cur_instruction->setImm(bitset<20>(cur_instruction->getFunc7().to_string() + cur_instruction->getRd().to_string()));
+        cur_instruction->setImm(bitset<12>(cur_instruction->getFunc7().to_string() + cur_instruction->getRd().to_string()));
         // Set Control Signals
         AluSrc[0] = 1;
         MemWr[0] = 1;
         ALUOp = bitset<4>(0b0010);
         }
     else if (cur_instruction->getOpcode() == beq) { 
-        cout << "\t\t\tbeq" << endl; 
+        // cout << "\t\t\tbeq" << endl; 
         // Update Stats
         cpu_stats->m_b++;
+        cpu_stats->m_beq++;
         // Set Immediate
         stringstream branch_immediate_ss;
         string func7 = cur_instruction->getFunc7().to_string();
@@ -184,7 +184,7 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
         string branch_immediate = branch_immediate_ss.str();
 
         // cout << "\t\t\t\t Branch Immediate: " << branch_immediate << endl;
-        cur_instruction->setImm(bitset<20>(branch_immediate));
+        cur_instruction->setImm(bitset<12>(branch_immediate));
         // Set Control Signals
         Branch[0] = 1;
         ALUOp = bitset<4>(0b0110);
@@ -199,15 +199,15 @@ tuple<bitset<32>, bitset<32>> CPU::RegisterFile(bitset<5> readReg1, bitset<5> re
     bitset<32> readData1(x[(readReg1.to_ulong())]);
     bitset<32> readData2(x[(readReg2.to_ulong())]);
     // Only Write to a register if RegWrite is 1
-    if (RegWrite[0] == 1) {
+    if (RegWrite[0] == 1 && writeReg.to_ulong() != 0) {
         x[writeReg.to_ulong()] = writeData;
     }
     return {readData1, readData2};
 }
 
 tuple<bitset<1>, bitset<32>> CPU::Execute(bitset<32> readData1, bitset<32> readData2, bitset<32> immediate) {
-    // TODO: Remove this line
-    cout << ALUOp.to_string() << " " << (int32_t)readData1.to_ulong() << " " << (AluSrc[0] == 1 ? (((int32_t)immediate.to_ulong() << 20) >> 20) : (int32_t)readData2.to_ulong()) << endl;
+    // Print the current operator and operands
+    // cout << ALUOp.to_string() << " " << (int32_t)readData1.to_ulong() << " " << (AluSrc[0] == 1 ? (((int32_t)immediate.to_ulong() << 20) >> 20) : (int32_t)readData2.to_ulong()) << endl;
 
     bitset<1> Zero = readData1 == ((AluSrc[0] == 1 ? immediate : readData2));
     bitset<32> ALUresult;
@@ -241,7 +241,7 @@ void CPU::Mem(bitset<5> rd, bitset<5> rs2, bitset<32> ALUresult, bitset<8> dataM
     if (MemRe[0] == 1) {
         // Load 4 bytes
         int i = ALUresult.to_ulong();
-        cout << "\t\t\tLOAD WORD: x" << rd.to_ulong() << " <- ";
+        // cout << "\t\t\tLOAD WORD: x" << rd.to_ulong() << " <- ";
         string d = dataMem[i++].to_string();
         string c = dataMem[i++].to_string();
         string b = dataMem[i++].to_string();
@@ -249,7 +249,7 @@ void CPU::Mem(bitset<5> rd, bitset<5> rs2, bitset<32> ALUresult, bitset<8> dataM
         // Reverse order since it is stored in little endian
         bitset<32> word(string(a + b + c + d));
         x[rd.to_ulong()] = word;
-        cout << word.to_string() << endl;
+        // cout << word.to_string() << endl;
     }
     // sw
     if (MemWr[0] == 1) {
@@ -257,7 +257,7 @@ void CPU::Mem(bitset<5> rd, bitset<5> rs2, bitset<32> ALUresult, bitset<8> dataM
         int i = ALUresult.to_ulong();
         bitset<32> extract_word(0b11111111);
         bitset<32> data_32bit(x[rs2.to_ulong()]);
-        cout << "\t\t\tSTORE WORD dataMem[" << i << "] <- x" << rs2.to_ulong() << endl;
+        // cout << "\t\t\tSTORE WORD dataMem[" << i << "] <- x" << rs2.to_ulong() << endl;
         dataMem[i++] = bitset<8>((extract_word & data_32bit).to_ulong());
         dataMem[i++] = bitset<8>((extract_word & (data_32bit >> 8)).to_ulong());
         dataMem[i++] = bitset<8>((extract_word & (data_32bit >> 16)).to_ulong());
@@ -272,15 +272,16 @@ void CPU::WriteBack(bitset<5> writeReg, bitset<32> ALUresult) {
     }
 }
 
-void CPU::PCAddr(bitset<1> Zero, bitset<32> immediate) {
+void CPU::PCAddr(bitset<1> Zero, bitset<32> immediate, CPUStat* cpu_stats) {
     if ( (Zero & Branch) == 1) {
         // Convert immediate to signed int
+        // Left Shift by 1 before adding to my_PC
         int32_t signed_imm = ((int32_t)immediate.to_ulong() << 21) >> 20;
-        cout << "SIGNED IMMEDIATE: " << signed_imm << endl;
         m_PC += signed_imm;
+        // Update Stats
+        cpu_stats->m_taken++;
     }
     else {
         m_PC += 4;
     }
-    cout << "PC: " << m_PC << endl;
 }

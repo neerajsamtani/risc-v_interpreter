@@ -34,8 +34,8 @@ class Instruction
         bitset<7> getFunc7();
         void setFunc7(bitset<7> func7);
 
-        bitset<20> getImm();
-        void setImm(bitset<20> imm);
+        bitset<12> getImm();
+        void setImm(bitset<12> imm);
 
         char getType();
         void setType(char type);
@@ -48,7 +48,7 @@ class Instruction
         bitset<5> m_rs1;
         bitset<5> m_rs2;
         bitset<7> m_func7;
-        bitset<20> m_imm;
+        bitset<12> m_imm;
         char m_type;
 };
 

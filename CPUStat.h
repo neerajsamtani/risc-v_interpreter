@@ -28,7 +28,8 @@ class CPUStat
         int m_sw;
         int m_lw;
         int m_add;
-        bool detailed_mode;
+        int m_beq;
+        int m_taken;
 
 };
 

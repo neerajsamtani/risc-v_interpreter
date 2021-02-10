@@ -31,7 +31,7 @@ Instruction::Instruction()
 }
 
 void Instruction::print() {
-    cout << "\t\t\t# " << "###" << endl;
+    cout << "\t\t\t#" << "################" << endl;
     cout << "\t\t\t# "  << "opcode: " << m_opcode.to_string() << endl;
     cout << "\t\t\t# "  << "rd: " << m_rd.to_ulong() << endl;
     cout << "\t\t\t# "  << "func3: " << m_func3.to_string() << endl;
@@ -39,7 +39,7 @@ void Instruction::print() {
     cout << "\t\t\t# "  << "rs2: " << m_rs2.to_string() << endl;
     cout << "\t\t\t# "  << "func7: " << m_func7.to_string() << endl;
     cout << "\t\t\t# "  << "imm: " << (((int32_t)m_imm.to_ulong() << 20) >> 20) << endl;
-    cout << "\t\t\t# "  << "###" << endl;
+    cout << "\t\t\t#"  << "################" << endl;
 }
 
 // Accessors and Mutators
@@ -104,12 +104,12 @@ void Instruction::setFunc7(bitset<7> func7)
     m_func7 = func7;
 }
 
-bitset<20> Instruction::getImm()
+bitset<12> Instruction::getImm()
 {
     return m_imm;
 }
 
-void Instruction::setImm(bitset<20> imm)
+void Instruction::setImm(bitset<12> imm)
 {
     m_imm = imm;
 }

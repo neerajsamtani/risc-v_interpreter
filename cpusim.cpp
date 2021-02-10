@@ -92,7 +92,8 @@ int main (int argc, char* argv[])
 			break;
 		}
 
-		cur_instruction.print();
+		// Print info about the current instruction
+		// cur_instruction.print();
 
 		// Read from the registers
 		// Explicitly set RegWrite to 0 so that we don't write at this stage
@@ -110,17 +111,13 @@ int main (int argc, char* argv[])
 		// Data Memory
 		myCPU.Mem(cur_instruction.getRd(), cur_instruction.getRs2(), ALUresult, dataMem);
 
-		cpu_stats.printRegisters(myCPU.getRegisters());
-		cpu_stats.printDataMemory(dataMem);
-
 		// Compute next PC
-		myCPU.PCAddr(Zero, immediate);
+		myCPU.PCAddr(Zero, immediate, &cpu_stats);
 
 	}
 
 	// clean up the memory (if any)
 
-	// TODO: Move this logic into CPUStat
 	// Check for printing flag
 	if (argc == 3) {
 		string flag = argv[2]; 

@@ -194,12 +194,9 @@ tuple<bitset<32>, bitset<32>> CPU::RegisterFile(bitset<5> readReg1, bitset<5> re
     // Handle Reads from the registers
     bitset<32> readData1(x[(readReg1.to_ulong())]);
     bitset<32> readData2(x[(readReg2.to_ulong())]);
-    // cout << "x" << readReg1.to_ulong() << ": " << readData1 << endl;
-    // cout << "x" << readReg2.to_ulong() << ": " << readData2 << endl;
     // Only Write to a register if RegWrite is 1
     if (RegWrite[0] == 1) {
-        cout << "Write  " << writeData.to_ulong() << " to register " << writeReg.to_ulong() << endl;
-        // x[writeReg.to_ulong()] = writeData;
+        x[writeReg.to_ulong()] = writeData;
     }
     return {readData1, readData2};
 }
@@ -229,4 +226,14 @@ tuple<bitset<1>, bitset<32>> CPU::Execute(bitset<32> readData1, bitset<32> readD
     }
     return {Zero, ALUresult};
 
+}
+
+void CPU::WriteBack(bitset<5> writeReg, bitset<32> ALUresult) {
+    if (RegWrite[0] == 1) {
+        RegisterFile(bitset<5>(0b0), bitset<5>(0b0), writeReg, ALUresult, bitset<1>(0b1));
+    }
+}
+
+bitset<32>* CPU::getRegisters() {
+    return x;
 }

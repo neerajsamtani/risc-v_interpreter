@@ -9,6 +9,7 @@
 #include <string>
 #include <stdlib.h>
 #include <tuple>
+#include <typeinfo>
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -54,6 +55,13 @@ int main (int argc, char* argv[])
 		instMem_len++;
 	}
 
+	// Define Data Memory Here
+	// Zero out all data before beginning
+	bitset<8> dataMem[32];
+	for (int i = 0; i < 32; i++) {
+		dataMem[i].reset();
+	}
+
 	/* Instantiate your CPU object here.  CPU class is the main class in this project that 
 	defines different components of the processor. 
 	CPU class also has different functions for each stage (e.g., fetching an Instruction, decoding, etc.). 
@@ -94,12 +102,30 @@ int main (int argc, char* argv[])
 		// Execute
 		auto [Zero, ALUresult] = myCPU.Execute(readData1, readData2, immediate);
 
+		// Write Back
+		myCPU.WriteBack(cur_instruction.getRd(), ALUresult);
+
 	}
 
 	// clean up the memory (if any)
 
+	// TODO: Move this logic into CPUStat
+	// Check for printing flag
+	if (argc == 3) {
+		string flag = argv[2]; 
+		if (flag == "-d1") {
+			cpu_stats.printRegisters(myCPU.getRegisters());
+		}
+		else if (flag == "-d2") {
+			cpu_stats.printDataMemory(dataMem);
+		}
+		else if (flag == "-d3") {
+			cpu_stats.printRegisters(myCPU.getRegisters());
+			cpu_stats.printDataMemory(dataMem);
+		}
+	}
 	// print the stats
-	cpu_stats.print();
+	cpu_stats.printStats();
 
 	return 0; 
 	

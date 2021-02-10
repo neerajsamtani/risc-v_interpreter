@@ -2,6 +2,9 @@
 
 #ifndef CPUSTAT_INCLUDED
 #define CPUSTAT_INCLUDED
+#include <bits/stdc++.h>
+
+using namespace std;
 
 class CPUStat
 {
@@ -9,7 +12,11 @@ class CPUStat
         // Constructor
         CPUStat();
         // Print Stats
-        void print();
+        void printStats();
+        // Print Registers
+        void printRegisters(bitset<32>* registers);
+        // Print Data Memory
+        void printDataMemory(bitset<8>* data_memory);
         // Member Variables
         int m_fetch_instr;
         int m_r;

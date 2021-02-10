@@ -92,6 +92,8 @@ int main (int argc, char* argv[])
 			break;
 		}
 
+		cur_instruction.print();
+
 		// Read from the registers
 		// Explicitly set RegWrite to 0 so that we don't write at this stage
 		auto [readData1, readData2] = myCPU.RegisterFile(cur_instruction.getRs1(), cur_instruction.getRs2(), cur_instruction.getRd(), bitset<32>(0b0), bitset<1>(0b0));
@@ -105,11 +107,14 @@ int main (int argc, char* argv[])
 		// Write Back
 		myCPU.WriteBack(cur_instruction.getRd(), ALUresult);
 
-		// cout << "### " << cur_instruction.getRd() << endl;
-		// cout << "### " <<  ALUresult << endl;
-
 		// Data Memory
 		myCPU.Mem(cur_instruction.getRd(), cur_instruction.getRs2(), ALUresult, dataMem);
+
+		cpu_stats.printRegisters(myCPU.getRegisters());
+		cpu_stats.printDataMemory(dataMem);
+
+		// Compute next PC
+		myCPU.PCAddr(Zero, immediate);
 
 	}
 

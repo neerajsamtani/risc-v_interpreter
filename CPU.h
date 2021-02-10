@@ -24,6 +24,7 @@ class CPU
       tuple<bitset<1>, bitset<32>> Execute(bitset<32> readData1, bitset<32> readData2, bitset<32> immediate);
       void Mem(bitset<5> rd, bitset<5> rs2, bitset<32> ALUresult, bitset<8> dataMem[]);
       void WriteBack(bitset<5> writeReg, bitset<32> ALUresult);
+      void PCAddr(bitset<1> Zero, bitset<32> immediate);
       //   // Getters
       //   bitset<1> getRegWrite();
       //   bitset<1> getAluSrc();

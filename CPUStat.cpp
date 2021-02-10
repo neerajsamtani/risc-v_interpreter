@@ -37,9 +37,9 @@ void CPUStat::printRegisters(bitset<32>* registers)
 	// TODO: Print in signed decimal
 	cout << "// Register file:" << endl;
 	for (int i = 0; i < 32; i++) {
-		cout << "x" << i << ": " << registers[i].to_ulong() << "\t";
+		cout << "x" << i << ": " << (int32_t)(registers[i].to_ulong()) << "\t";
 		i++;
-		cout << "x" << i << ": " << registers[i].to_ulong() << endl;
+		cout << "x" << i << ": " << (int32_t)(registers[i].to_ulong()) << endl;
 	}
 	cout << "// END of Register file" << endl;
 }
@@ -47,7 +47,8 @@ void CPUStat::printRegisters(bitset<32>* registers)
 void CPUStat::printDataMemory(bitset<8>* data_memory) {
 	cout << "// Data Memory:" << endl;
 	for (int i = 0; i < 32; i++) {
-		cout << "0x" << hex << i << ": " << data_memory[i] << endl;
+		// TODO: Print in hex
+		cout << i << ": " << data_memory[i] << endl;
 	}
 	cout << "// END of Data Memory" << endl;
 }

@@ -31,15 +31,15 @@ Instruction::Instruction()
 }
 
 void Instruction::print() {
-    cout << "###" << endl;
-    cout << "opcode: " << m_opcode.to_string() << endl;
-    cout << "rd: " << m_rd.to_ulong() << endl;
-    cout << "func3: " << m_func3.to_string() << endl;
-    cout << "rs1: " << m_rs1.to_string() << endl;
-    cout << "rs2: " << m_rs2.to_string() << endl;
-    cout << "func7: " << m_func7.to_string() << endl;
-    cout << "imm: " << m_imm.to_ulong() << endl;
-    cout << "###" << endl;
+    cout << "\t\t\t# " << "###" << endl;
+    cout << "\t\t\t# "  << "opcode: " << m_opcode.to_string() << endl;
+    cout << "\t\t\t# "  << "rd: " << m_rd.to_ulong() << endl;
+    cout << "\t\t\t# "  << "func3: " << m_func3.to_string() << endl;
+    cout << "\t\t\t# "  << "rs1: " << m_rs1.to_string() << endl;
+    cout << "\t\t\t# "  << "rs2: " << m_rs2.to_string() << endl;
+    cout << "\t\t\t# "  << "func7: " << m_func7.to_string() << endl;
+    cout << "\t\t\t# "  << "imm: " << (((int32_t)m_imm.to_ulong() << 20) >> 20) << endl;
+    cout << "\t\t\t# "  << "###" << endl;
 }
 
 // Accessors and Mutators

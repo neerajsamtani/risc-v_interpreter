@@ -97,13 +97,17 @@ int main (int argc, char* argv[])
 
 		// Read from the registers
 		// Explicitly set RegWrite to 0 so that we don't write at this stage
-		auto [readData1, readData2] = myCPU.RegisterFile(cur_instruction.getRs1(), cur_instruction.getRs2(), cur_instruction.getRd(), bitset<32>(0b0), bitset<1>(0b0));
+		bitset<32> readData1;
+		bitset<32> readData2;
+		tie(readData1, readData2) = myCPU.RegisterFile(cur_instruction.getRs1(), cur_instruction.getRs2(), cur_instruction.getRd(), bitset<32>(0b0), bitset<1>(0b0));
 
 		// Convert Immediate into a 32 bit value
 		bitset<32> immediate(cur_instruction.getImm().to_ulong());
 
 		// Execute
-		auto [Zero, ALUresult] = myCPU.Execute(readData1, readData2, immediate);
+		bitset<1> Zero;
+		bitset<32> ALUresult;
+		tie(Zero, ALUresult) = myCPU.Execute(readData1, readData2, immediate);
 
 		// Write Back
 		myCPU.WriteBack(cur_instruction.getRd(), ALUresult);

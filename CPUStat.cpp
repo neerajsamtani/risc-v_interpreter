@@ -7,16 +7,28 @@
 using namespace std;
 
 /*
-CPUStat Class
-- Track with function getters and setters
-	1.Total number of fetched instructions
-	2.Total number of instructions for each type (i.e., R-type, I-type,S,B, U, and J)
-	3.Number of SW, LW, and ADD instructions.
-- Print these values into terminal with this format
+CPUStat (Class)
+- Use the values in the "Instruction" and "CPU" classes to count the following:
+	1. Total number of fetched instructions
+	2. Number of SW, LW, ADD, and BEQ instructions.
+	3. Number of Taken Branches
+- The output should be in the following format:
 	#fetch_instr
-	#R, #I, #S, #B, U, #J
-	#SW, #LW, #ADD
-- optional detailed mode with flag -d
+	#SW, #LW, #ADD, #BEQ
+	#Taken
+- Print the values in all the registers, which is activated with flag -d1. 
+	The print should be in this format (values in signed decimal):
+	“ // Register file:
+	x0: (tab) x1:
+	x2: (tab) x3:
+	...
+	// END of Register file”
+- Should be able to print the values in data memory
+- Response to -dVal (logic in CPU Class)
+	-d0 : no print at all
+	-d1 : print registers
+	-d2 : print memory
+	-d3 : print both registers and memory
 */
 
 CPUStat::CPUStat()

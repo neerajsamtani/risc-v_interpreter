@@ -9,24 +9,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-/*
-CPU Class
-- function fetch
-	- access instMem by using address stored in program counter
-	- store the value in a 32-bit unsigned variable
-	- to read instructions, you need to access four lines of memory: PC to PC+3 and do the proper shifting
-	in order to create a 32 bit value
-	- return the final value or store it in an internal variable in the cpu class
-	- create the next value of the PC (PC + 4) 
-- function decode
-	- use the 32 bit value from function fetch and assign proper values for each variable in the Instruction class
-	- check the opcode and return FALSE if opcode is equal to 0. We call this Instruction 'end'.
-	This return value will be ised to break the while loop in the main function.
-	- update CPU stats based on opcode and other relevant values for each Instruction
-- constructor
-- program counter
-*/
-
 CPU::CPU()
 {
     // 0 out everything
@@ -46,6 +28,13 @@ CPU::CPU()
 
 void CPU::Fetch(string instMem[], int instMem_len) 
 {
+    // - access instMem by using address stored in program counter
+	// - store the value in a 32-bit unsigned variable
+	// - to read instructions, you need to access four lines of memory: PC to PC+3 and do the proper shifting
+	// in order to create a 32 bit value
+	// - return the final value or store it in an internal variable in the cpu class
+	// - create the next value of the PC (PC + 4) 
+
     // Load 4 bytes
     int i = m_PC;
     string d = instMem[i++];
@@ -58,6 +47,11 @@ void CPU::Fetch(string instMem[], int instMem_len)
 
 bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
 {
+    // - use the 32 bit value from function fetch and assign proper values for each variable in the Instruction class
+	// - check the opcode and return FALSE if opcode is equal to 0. We call this Instruction 'end'.
+	// This return value will be used to break the while loop in the main function.
+	// - update CPU stats based on opcode and other relevant values for each Instruction
+
     // Binary opcodes for comparison
     bitset<7> rtype("0110011");
     bitset<7> itype("0010011");
@@ -86,6 +80,10 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
         // Update Stats
         cpu_stats->m_fetch_instr++;
     }
+
+    // Controller (Function)
+    // - Creates all the required control signals (Lec 7 Slide 12). Can use 4 bit ALU op
+    // - Compute the correct immediate once the instruction is decoded
 
     // Zero Out Control Signals
     RegWrite.reset();
@@ -195,6 +193,10 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
 }
 
 tuple<bitset<32>, bitset<32>> CPU::RegisterFile(bitset<5> readReg1, bitset<5> readReg2,bitset<5> writeReg, bitset<32> writeData, bitset<1> RegWrite) {
+    // - Handle reads and writes to the register file, an array with 32 entries in the CPU class
+    // - Assign x0 to zero (always)
+    // - Registers cannot be written to unless RegWrite is equal to one
+    
     // Handle Reads from the registers
     bitset<32> readData1(x[(readReg1.to_ulong())]);
     bitset<32> readData2(x[(readReg2.to_ulong())]);
@@ -206,6 +208,11 @@ tuple<bitset<32>, bitset<32>> CPU::RegisterFile(bitset<5> readReg1, bitset<5> re
 }
 
 tuple<bitset<1>, bitset<32>> CPU::Execute(bitset<32> readData1, bitset<32> readData2, bitset<32> immediate) {
+    // - This is where all activities during the execute stage should be handled
+    // - ALU is the main part of this
+    // - Uses proper muxes (assignments with if/else) when connecting inputs to outputs
+    // - Separate output for "zero"
+    
     // Print the current operator and operands
     // cout << ALUOp.to_string() << " " << (int32_t)readData1.to_ulong() << " " << (AluSrc[0] == 1 ? (((int32_t)immediate.to_ulong() << 20) >> 20) : (int32_t)readData2.to_ulong()) << endl;
 
@@ -237,6 +244,10 @@ bitset<32>* CPU::getRegisters() {
 }
 
 void CPU::Mem(bitset<5> rd, bitset<5> rs2, bitset<32> ALUresult, bitset<8> dataMem[]) {
+    // - Handle reads and writes to/from data memory
+    // - Writes can only happen if "MemWrite" is 1
+    // - Use an array to create data memory
+
     // lw
     if (MemRe[0] == 1) {
         // Load 4 bytes
@@ -266,6 +277,8 @@ void CPU::Mem(bitset<5> rd, bitset<5> rs2, bitset<32> ALUresult, bitset<8> dataM
 }
 
 void CPU::WriteBack(bitset<5> writeReg, bitset<32> ALUresult) {
+    // - Handle writes to the register file. 
+    // Call the Register File function with "RegWrite" equal to 1 (if the control signal = 1, otherwise no writing is needed)
     // TODO: Handle MemtoReg MUX????
     if (RegWrite[0] == 1) {
         RegisterFile(bitset<5>(0b0), bitset<5>(0b0), writeReg, ALUresult, bitset<1>(0b1));
@@ -273,6 +286,9 @@ void CPU::WriteBack(bitset<5> writeReg, bitset<32> ALUresult) {
 }
 
 void CPU::PCAddr(bitset<1> Zero, bitset<32> immediate, CPUStat* cpu_stats) {
+    // - Handle all the work to compute the next PC
+	// - Compute PC+4 or PC+offset
+	// - Compute whether the branch is taken or not (by ANDing "Zero" with "Branch")
     if ( (Zero & Branch) == 1) {
         // Convert immediate to signed int
         // Left Shift by 1 before adding to my_PC

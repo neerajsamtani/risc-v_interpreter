@@ -88,6 +88,16 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
         // Update Stats
         cpu_stats->m_fetch_instr++;
     }
+
+    // Zero Out Control Signals
+    RegWrite.reset();
+    AluSrc.reset();
+    Branch.reset();
+    MemRe.reset();
+    MemWr.reset();
+    MemtoReg.reset();
+    ALUOp.reset();
+
     if (cur_instruction->getOpcode() == rtype) { 
         // cout << "rtype" << endl;
         // Update Stats
@@ -179,12 +189,44 @@ bool CPU::Decode(CPUStat* cpu_stats, Instruction* cur_instruction)
     // return false if opcode is equal to 0
     return cur_instruction->getOpcode() != nop;
 }
-void CPU::RegisterFile(bitset<5> readReg1, bitset<5> readReg2,bitset<5> writeReg, bitset<32> writeData, bitset<1> RegWrite) {
+
+tuple<bitset<32>, bitset<32>> CPU::RegisterFile(bitset<5> readReg1, bitset<5> readReg2,bitset<5> writeReg, bitset<32> writeData, bitset<1> RegWrite) {
     // Handle Reads from the registers
-    cout << "x" << readReg1.to_ulong() << ": " << x[(readReg1.to_ulong())] << endl;
-    cout << "x" << readReg2.to_ulong() << ": " << x[(readReg2.to_ulong())] << endl;
+    bitset<32> readData1(x[(readReg1.to_ulong())]);
+    bitset<32> readData2(x[(readReg2.to_ulong())]);
+    // cout << "x" << readReg1.to_ulong() << ": " << readData1 << endl;
+    // cout << "x" << readReg2.to_ulong() << ": " << readData2 << endl;
     // Only Write to a register if RegWrite is 1
     if (RegWrite[0] == 1) {
         cout << "Write  " << writeData.to_ulong() << " to register " << writeReg.to_ulong() << endl;
+        // x[writeReg.to_ulong()] = writeData;
     }
+    return {readData1, readData2};
+}
+
+tuple<bitset<1>, bitset<32>> CPU::Execute(bitset<32> readData1, bitset<32> readData2, bitset<32> immediate) {
+    // TODO: Remove this line
+    cout << ALUOp.to_string() << " " << readData1.to_ulong() << " " << (AluSrc[0] == 1 ? immediate.to_ulong() : readData2.to_ulong()) << endl;
+
+    bitset<1> Zero = readData1 == ((AluSrc[0] == 1 ? immediate : readData2));
+    bitset<32> ALUresult;
+
+    if (ALUOp == bitset<4>(0b0010)) {
+        // cout << "add" << endl;
+        ALUresult = bitset<32>(readData1.to_ulong() + (AluSrc[0] == 1 ? immediate.to_ulong() : readData2.to_ulong()));
+    }
+    else if (ALUOp == bitset<4>(0b0110)) {
+        // cout << "sub" << endl;
+        ALUresult = bitset<32>(readData1.to_ulong() - (AluSrc[0] == 1 ? immediate.to_ulong() : readData2.to_ulong()));
+    }
+    else if (ALUOp == bitset<4>(0b0000)) {
+        // cout << "and" << endl;
+        ALUresult = readData1 & (AluSrc[0] == 1 ? immediate : readData2);
+    }
+    else if (ALUOp == bitset<4>(0b0001)) {
+        // cout << "or" << endl;
+        ALUresult = readData1 | (AluSrc[0] == 1 ? immediate : readData2);
+    }
+    return {Zero, ALUresult};
+
 }

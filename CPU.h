@@ -4,6 +4,7 @@
 #define CPU_INCLUDED
 
 #include <string>
+#include <tuple>
 #include <bits/stdc++.h>
 #include "Instruction.h"
 using namespace std;
@@ -19,7 +20,8 @@ class CPU
       // Functions
       void Fetch(string instMem[], int instMem_len);
       bool Decode(CPUStat* cpu_stats, Instruction* cur_instruction);
-      void RegisterFile(bitset<5> readReg1, bitset<5> readReg2,bitset<5> writeReg, bitset<32> writeData, bitset<1> RegWrite);
+      tuple<bitset<32>, bitset<32>> RegisterFile(bitset<5> readReg1, bitset<5> readReg2,bitset<5> writeReg, bitset<32> writeData, bitset<1> RegWrite);
+      tuple<bitset<1>, bitset<32>> Execute(bitset<32> readData1, bitset<32> readData2, bitset<32> immediate);
       //   // Getters
       //   bitset<1> getRegWrite();
       //   bitset<1> getAluSrc();
@@ -41,9 +43,6 @@ class CPU
       int m_PC;
       bitset<32> m_32bit_instruction; // 32 bit instruction in binary
       bitset<32> x[32]; // Registers
-      // Register File Outputs
-      bitset<32> readData1;
-      bitset<32> readData2;
       // Control Signals
       bitset<1> RegWrite;
       bitset<1> AluSrc;

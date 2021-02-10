@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include <stdlib.h>
+#include <tuple>
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -73,18 +74,25 @@ int main (int argc, char* argv[])
 	while (1) // processor's main loop. Each iteration is equal to one clock cycle.  
 	{
 		//fetch
-		myCPU.Fetch(instMem, instMem_len); // fetching the Instruction
+		myCPU.Fetch(instMem, instMem_len);
+		
 		// decode
-		to_continue = myCPU.Decode(&cpu_stats, &cur_instruction); // decoding
-
+		to_continue = myCPU.Decode(&cpu_stats, &cur_instruction);
 		// we should break the loop if the current Instruction is BREAK Instruction (i.e., if opcode == 0)
 		if (!to_continue)
 		{
 			break;
 		}
+
 		// Read from the registers
 		// Explicitly set RegWrite to 0 so that we don't write at this stage
-		myCPU.RegisterFile(cur_instruction.getRs1(), cur_instruction.getRs2(), cur_instruction.getRd(), bitset<32>(0b0), bitset<1>(0b0));
+		auto [readData1, readData2] = myCPU.RegisterFile(cur_instruction.getRs1(), cur_instruction.getRs2(), cur_instruction.getRd(), bitset<32>(0b0), bitset<1>(0b0));
+
+		// Convert Immediate into a 32 bit value
+		bitset<32> immediate(cur_instruction.getImm().to_ulong());
+
+		// Execute
+		auto [Zero, ALUresult] = myCPU.Execute(readData1, readData2, immediate);
 
 	}
 
